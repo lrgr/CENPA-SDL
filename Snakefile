@@ -15,26 +15,39 @@ rule all:
     input:
         DEPMAP_CRISPR_DATA,
         DEPMAP_RNAI_DATA,
-        TCGA_DATA
+        TCGA_DATA,
+        CCLE_RPKM_DATA
 
-rule download_datasets:
+rule download_tcga_isle:
+    params:
+        url = TCGA_URL
+    output: 
+        TCGA_DATA
+    shell:
+        'wget -O {output} {params.url}'
+
+rule download_depmap:
     params:
         crispr_url = DEPMAP_CRISPR_URL,
-        rnai_url = DEPMAP_RNAI_URL,
-        tcga_url = TCGA_URL,
-        ccle_rpkm_url = CCLE_RPKM_URL
+        rnai_url = DEPMAP_RNAI_URL
     output:
         crispr_data = DEPMAP_CRISPR_DATA,
-        rnai_data = DEPMAP_RNAI_DATA,
-        tcga_data = TCGA_DATA,
-        ccle_rpkm_data_gz = CCLE_RPKM_DATA_GZ
-        ccle_rpkm_data = CCLE_RPKM_DATA
+        rnai_data = DEPMAP_RNAI_DATA
     shell:
         '''
         wget -O {output.crispr_data} {params.crispr_url}
-        wget -O {output.rnai_data} {params.rnai_url} 
-        wget -O {output.tcga_data} {params.tcga_url}
-        wget -O {output.ccle_rpkm_data_gz} {params.ccle_rpkm_url}
-        gzip -d {output.ccle_rpkm_data_gz}
+        wget -O {output.rnai_data} {params.rnai_url}
         '''
+
+rule download_ccle_rpkm:
+    params:
+        url = CCLE_RPKM_URL
+    output:
+        CCLE_RPKM_DATA
+    shell:
+        '''
+        wget -O {CCLE_RPKM_DATA_GZ} {params.url}
+        gzip -d {CCLE_RPKM_DATA_GZ}
+        '''
+
 
