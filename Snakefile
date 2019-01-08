@@ -30,6 +30,7 @@ config['DepMap_data']=config.get('DepMap_data','CRISPR')
 GOI_RPKM_SORTED = join(OUTPUT_DIR,'{}_RPKM_sorted.tsv'.format(config.get('GOI')))
 GOI_RPKM_SUBSET = join(OUTPUT_DIR,'{}_RPKM_sorted_subset_depmap_{}.tsv'.format(config.get('GOI'),config.get('DepMap_data')))
 DEPMAP_SUBSET = join(OUTPUT_DIR,'{}_depmap_{}_subset.tsv'.format(config.get('GOI'),config.get('DepMap_data')))
+RPKM_DISTRIBUTION_PLOT = join(OUTPUT_DIR,'comparing_rpkm_distribution.png')
 
 rule all: 
     input:
@@ -40,7 +41,8 @@ rule all:
         DEPMAP_CELL_LINE_METADATA,
         GOI_RPKM_SORTED,
         GOI_RPKM_SUBSET,
-        DEPMAP_SUBSET
+        DEPMAP_SUBSET,
+        RPKM_DISTRIBUTION_PLOT
 
 rule subset_GOI_rpkm_depmap:
     input:
@@ -49,7 +51,8 @@ rule subset_GOI_rpkm_depmap:
         GOI_RPKM_SORTED
     output:
         GOI_RPKM_SUBSET,
-        DEPMAP_SUBSET
+        DEPMAP_SUBSET,
+        RPKM_DISTRIBUTION_PLOT
     shell:
         '''
         python {SUBSET_RPKM_SCRIPT} \
@@ -57,7 +60,8 @@ rule subset_GOI_rpkm_depmap:
         -gd {DEPMAP_CRISPR_DATA} \
         -md {DEPMAP_CELL_LINE_METADATA} \
         -or {GOI_RPKM_SUBSET} \
-        -odm {DEPMAP_SUBSET}
+        -odm {DEPMAP_SUBSET} \
+        -p {RPKM_DISTRIBUTION_PLOT}
         '''
   
 
