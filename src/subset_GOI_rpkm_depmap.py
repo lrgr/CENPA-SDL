@@ -8,7 +8,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-r','--rpkm',type = str,required = True)
 parser.add_argument('-gd','--gene_dependency_data',type = str, required=True)
 parser.add_argument('-md','--metadata',type = str, required= True)
-parser.add_argument('-o','--output',type = str, required=True)
+parser.add_argument('-or','--output_rpkm',type = str, required=True)
+parser.add_argument('-odm','--output_depmap',type = str, required=True)
 args = parser.parse_args(sys.argv[1:])
 
 # load cell line metadata 
@@ -43,5 +44,9 @@ gd_cells = list(set(df_rpkm['Cell Line']).intersection(set(df_gd['CCLE_name'])))
 df_rpkm = df_rpkm.set_index('Cell Line')
 df_rpkm_subet = df_rpkm.loc[gd_cells]
 df_rpkm_subet = df_rpkm_subet.sort_values(by = ['RPKM'],ascending=False)
-df_rpkm_subet.to_csv(args.output,sep = '\t')
+df_rpkm_subet.to_csv(args.output_rpkm,sep = '\t')
 
+#subset the deommao data so that it only contains depmap data of cell lines found in both RPKM and gene dependency data
+df_gd = df_gd.set_index('CCLE_name')
+df_gd_subset = df_gd.loc[gd_cells]
+df_gd_subset.to_csv(args.output_depmap,sep = '\t')

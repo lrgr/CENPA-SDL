@@ -13,7 +13,7 @@ DEPMAP_CELL_LINE_METADATA = join(DATA_DIR,'DepMap_cell_line_metadata.csv')
 
 #Scripts
 GOI_RPKM_SCRIPT = join(SRC_DIR,'sort_cell_lines_by_GOI_RPKM.py')
-SUBSET_RPKM_SCRIPT = join(SRC_DIR,'subset_GOI_rpkm.py')
+SUBSET_RPKM_SCRIPT = join(SRC_DIR,'subset_GOI_rpkm_depmap.py')
 
 # URL of files needed
 DEPMAP_CRISPR_URL = 'https://ndownloader.figshare.com/files/13396070'
@@ -29,6 +29,7 @@ config['DepMap_data']=config.get('DepMap_data','CRISPR')
 # Outputs
 GOI_RPKM_SORTED = join(OUTPUT_DIR,'{}_RPKM_sorted.tsv'.format(config.get('GOI')))
 GOI_RPKM_SUBSET = join(OUTPUT_DIR,'{}_RPKM_sorted_subset_depmap_{}.tsv'.format(config.get('GOI'),config.get('DepMap_data')))
+DEPMAP_SUBSET = join(OUTPUT_DIR,'{}_depmap_{}_subset.tsv'.format(config.get('GOI'),config.get('DepMap_data')))
 
 rule all: 
     input:
@@ -38,22 +39,25 @@ rule all:
         CCLE_RPKM_DATA,
         DEPMAP_CELL_LINE_METADATA,
         GOI_RPKM_SORTED,
-        GOI_RPKM_SUBSET
+        GOI_RPKM_SUBSET,
+        DEPMAP_SUBSET
 
-rule subset_GOI_rpkm:
+rule subset_GOI_rpkm_depmap:
     input:
         DEPMAP_CRISPR_DATA,
-        DEPMAP_CELL_LINE_METADATA,
+        DEPMAP_CELL_LINE_METADATA, 
         GOI_RPKM_SORTED
     output:
-        GOI_RPKM_SUBSET
+        GOI_RPKM_SUBSET,
+        DEPMAP_SUBSET
     shell:
         '''
         python {SUBSET_RPKM_SCRIPT} \
         -r {GOI_RPKM_SORTED} \
         -gd {DEPMAP_CRISPR_DATA} \
         -md {DEPMAP_CELL_LINE_METADATA} \
-        -o {GOI_RPKM_SUBSET}
+        -or {GOI_RPKM_SUBSET} \
+        -odm {DEPMAP_SUBSET}
         '''
   
 
