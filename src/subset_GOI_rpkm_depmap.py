@@ -10,6 +10,7 @@ import seaborn as sns
 from scipy.stats import mannwhitneyu
 
 parser = argparse.ArgumentParser()
+parser.add_argument('-g','--gene',type = str,required = True)
 parser.add_argument('-r','--rpkm',type = str,required = True)
 parser.add_argument('-gd','--gene_dependency_data',type = str, required=True)
 parser.add_argument('-md','--metadata',type = str, required= True)
@@ -104,7 +105,7 @@ fig, ax = plt.subplots()
 fig.set_size_inches(20, 20)
 sns.stripplot(x='Data', y = 'RPKM',data = plot_ready, 
               jitter= True, size = 6, 
-              palette = strip_color).set_title('Comparing RPKM Distribution',fontsize = 40,y=1.03)
+              palette = strip_color).set_title('Comparing {} RPKM Distribution'.format(args.gene),fontsize = 40,y=1.03)
 sns.boxplot(x='Data', y = 'RPKM',
             data = plot_ready,
             width = 0.35, 
