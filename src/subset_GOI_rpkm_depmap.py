@@ -1,3 +1,8 @@
+#This script does the following: 
+# (1) Find the cell lines that are covered by both CCLE RNAseq data (RPKM) and DepMap gene dependecy data
+# (2) Save the RPKM data and gene dependency data of cell lines found in both datasets to seperate tsv files for downstream analysis
+# (3) Plot the expression distribution of gene of interests in cell lines to show if the selected cell lines has a skewed distribution in gene expression
+
 import pandas as pd
 import numpy as np
 import scipy as sp
@@ -19,6 +24,7 @@ parser.add_argument('-odm','--output_depmap',type = str, required=True)
 parser.add_argument('-p','--plot',type = str, required=True)
 args = parser.parse_args(sys.argv[1:])
 
+# (1) Find the cell lines that are covered by both CCLE RNAseq data (RPKM) and DepMap gene dependecy data
 # load cell line metadata 
 df_md = pd.read_csv(args.metadata,sep = ',')
 
@@ -47,7 +53,7 @@ df_gd.columns = new_col_name
 # generate list of cell lines found in both gene dependency data and the RPKM data
 overlapping_cells = list(set(df_rpkm['Cell Line']).intersection(set(df_gd['CCLE_name'])))
 
-
+# (2) Save the RPKM data and gene dependency data of cell lines found in both datasets to seperate tsv files for downstream analysis
 # subset the rpkm data so that it only contains RPKM data of cell lines found in both RPKM and gene dependency data
 df_rpkm = df_rpkm.set_index('Cell Line')
 df_rpkm_subet = pd.DataFrame(df_rpkm.loc[overlapping_cells])
@@ -56,15 +62,14 @@ df_rpkm_subet.to_csv(args.output_rpkm,sep = '\t')
 
 print('RPKM subset completed')
 
-#subset the deommao data so that it only contains depmap data of cell lines found in both RPKM and gene dependency data
+#subset the depmap data so that it only contains depmap data of cell lines found in both RPKM and gene dependency data
 df_gd = df_gd.set_index('CCLE_name')
 df_gd_subset = df_gd.loc[overlapping_cells]
 df_gd_subset.to_csv(args.output_depmap,sep = '\t')
 
 print('DepMap subset completed')
 
-#plots the RPKM distribution of cells in ccle rpkm data and those found in both datasets
-#now df_rpkm_for_plot and df_rpkm_subset_for_plot both contain information of ranks
+# (3) Plot the expression distribution of gene of interests in cell lines to show if the selected cell lines has a skewed distribution in gene expression
 #combine the RPKM into the same dataframe for plotting
 ccle_rpkm = df_rpkm.reset_index()
 ccle_rpkm['Data'] = ['CCLE' for cell in range(len(ccle_rpkm))]
@@ -72,8 +77,7 @@ ccle_rpkm['Data'] = ['CCLE' for cell in range(len(ccle_rpkm))]
 subset_rpkm = df_rpkm_subet.reset_index()
 subset_rpkm['Data'] = ['CCLE overlapping with DepMap' for cell in range(len(subset_rpkm))]
 
-
-#cells in CCLE RPKM data that do not overlap with cells in Dep Map data
+## find cells in CCLE RPKM data that do not overlap with cells in Dep Map data
 subset_status = [cell in overlapping_cells for cell in list(ccle_rpkm['Cell Line']) ]
 ccle_rpkm['subset status'] = subset_status
 non_subset_rpkm = pd.DataFrame(ccle_rpkm[ccle_rpkm['subset status']==False])
@@ -105,7 +109,7 @@ fig, ax = plt.subplots()
 fig.set_size_inches(20, 20)
 sns.stripplot(x='Data', y = 'RPKM',data = plot_ready, 
               jitter= True, size = 6, 
-              palette = strip_color).set_title('Comparing {} RPKM Distribution'.format(args.gene),fontsize = 40,y=1.03)
+              palette = strip_color).set_title('Comparing {} Expression Distribution'.format(args.gene),fontsize = 40,y=1.03)
 sns.boxplot(x='Data', y = 'RPKM',
             data = plot_ready,
             width = 0.35, 

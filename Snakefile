@@ -14,6 +14,7 @@ DEPMAP_CELL_LINE_METADATA = join(DATA_DIR,'DepMap_cell_line_metadata.csv')
 #Scripts
 GOI_RPKM_SCRIPT = join(SRC_DIR,'sort_cell_lines_by_GOI_RPKM.py')
 SUBSET_RPKM_SCRIPT = join(SRC_DIR,'subset_GOI_rpkm_depmap.py')
+UNBIASED_ANALYSIS = join(SRC_DIR,'unbiased_gene_dependency_analysis.py')
 
 # URL of files needed
 DEPMAP_CRISPR_URL = 'https://ndownloader.figshare.com/files/13396070'
@@ -30,7 +31,8 @@ config['DepMap_data']=config.get('DepMap_data','CRISPR')
 GOI_RPKM_SORTED = join(OUTPUT_DIR,'{}_RPKM_sorted.tsv'.format(config.get('GOI')))
 GOI_RPKM_SUBSET = join(OUTPUT_DIR,'{}_RPKM_sorted_subset_depmap_{}.tsv'.format(config.get('GOI'),config.get('DepMap_data')))
 DEPMAP_SUBSET = join(OUTPUT_DIR,'{}_depmap_{}_subset.tsv'.format(config.get('GOI'),config.get('DepMap_data')))
-RPKM_DISTRIBUTION_PLOT = join(OUTPUT_DIR,'comparing_{}_rpkm_distribution.png'.format(config.get('GOI')))
+RPKM_DISTRIBUTION_PLOT = join(OUTPUT_DIR,'comparing_{}_expression_distribution.png'.format(config.get('GOI')))
+WILCOXON_RANKSUM_RESULTS = join(OUTPUT_DIR,'wilcoxon_ranksum_results.tsv')
 
 rule all: 
     input:
@@ -42,7 +44,25 @@ rule all:
         GOI_RPKM_SORTED,
         GOI_RPKM_SUBSET,
         DEPMAP_SUBSET,
-        RPKM_DISTRIBUTION_PLOT
+        RPKM_DISTRIBUTION_PLOT,
+        WILCOXON_RANKSUM_RESULTS
+
+rule unbiased_gene_dependency_analysis:
+    input:
+        GOI_RPKM_SUBSET,
+        DEPMAP_SUBSET
+    output:
+        WILCOXON_RANKSUM_RESULTS
+    params:
+        GOI = config.get('GOI')
+    shell:
+        '''
+        python {UNBIASED_ANALYSIS} \
+        -g {params.GOI} \
+        -rs {GOI_RPKM_SUBSET} \
+        -gds {DEPMAP_SUBSET} \
+        -o {WILCOXON_RANKSUM_RESULTS}
+        '''
 
 rule subset_GOI_rpkm_depmap:
     input:
