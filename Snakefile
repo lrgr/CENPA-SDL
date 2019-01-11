@@ -14,7 +14,7 @@ DEPMAP_CELL_LINE_METADATA = join(DATA_DIR,'DepMap_cell_line_metadata.csv')
 #Scripts
 GOI_RPKM_SCRIPT = join(SRC_DIR,'sort_cell_lines_by_GOI_RPKM.py')
 SUBSET_RPKM_SCRIPT = join(SRC_DIR,'subset_GOI_rpkm_depmap.py')
-PAN_CANCER_UNBIASED_ANALYSIS = join(SRC_DIR,'pan_cancer_unbiased_gene_dependency_analysis.py.py')
+PAN_CANCER_UNBIASED_ANALYSIS = join(SRC_DIR,'pan_cancer_unbiased_gene_dependency_analysis.py')
 TISSUE_SPECIFIC_UNBIASED_ANALYSIS= join(SRC_DIR,'tissue_specific_unbiased_gene_dependency_analysis.py')
 
 # URL of files needed
