@@ -14,7 +14,8 @@ DEPMAP_CELL_LINE_METADATA = join(DATA_DIR,'DepMap_cell_line_metadata.csv')
 #Scripts
 GOI_RPKM_SCRIPT = join(SRC_DIR,'sort_cell_lines_by_GOI_RPKM.py')
 SUBSET_RPKM_SCRIPT = join(SRC_DIR,'subset_GOI_rpkm_depmap.py')
-UNBIASED_ANALYSIS = join(SRC_DIR,'unbiased_gene_dependency_analysis.py')
+PAN_CANCER_UNBIASED_ANALYSIS = join(SRC_DIR,'pan_cancer_unbiased_gene_dependency_analysis.py.py')
+TISSUE_SPECIFIC_UNBIASED_ANALYSIS= join(SRC_DIR,'tissue_specific_unbiased_gene_dependency_analysis.py')
 
 # URL of files needed
 DEPMAP_CRISPR_URL = 'https://ndownloader.figshare.com/files/13396070'
@@ -33,6 +34,8 @@ GOI_RPKM_SUBSET = join(OUTPUT_DIR,'{}_RPKM_sorted_subset_depmap_{}.tsv'.format(c
 DEPMAP_SUBSET = join(OUTPUT_DIR,'{}_depmap_{}_subset.tsv'.format(config.get('GOI'),config.get('DepMap_data')))
 RPKM_DISTRIBUTION_PLOT = join(OUTPUT_DIR,'comparing_{}_expression_distribution.png'.format(config.get('GOI')))
 WILCOXON_RANKSUM_RESULTS = join(OUTPUT_DIR,'wilcoxon_ranksum_results.tsv')
+TISSUE_SPECFIC_DIR ='tissue_specific_unbiased_analysis'
+TISSUE_SPECFIC_OUTPUT_DIR = join(OUTPUT_DIR,TISSUE_SPECFIC_DIR)
 
 rule all: 
     input:
@@ -45,9 +48,27 @@ rule all:
         GOI_RPKM_SUBSET,
         DEPMAP_SUBSET,
         RPKM_DISTRIBUTION_PLOT,
-        WILCOXON_RANKSUM_RESULTS
+        WILCOXON_RANKSUM_RESULTS,
+        TISSUE_SPECFIC_OUTPUT_DIR
 
-rule unbiased_gene_dependency_analysis:
+rule tissue_specific_unbiased_gene_dependency_analysis:
+    input:
+        GOI_RPKM_SUBSET,
+        DEPMAP_SUBSET
+    output:
+        TISSUE_SPECFIC_OUTPUT_DIR
+    params:
+        GOI = config.get('GOI')
+    shell:
+        '''
+        python {TISSUE_SPECIFIC_UNBIASED_ANALYSIS} \
+        -g {params.GOI} \
+        -rs {GOI_RPKM_SUBSET} \
+        -gds {DEPMAP_SUBSET} \
+        -od {TISSUE_SPECFIC_OUTPUT_DIR}
+
+
+rule pan_cancer_unbiased_gene_dependency_analysis:
     input:
         GOI_RPKM_SUBSET,
         DEPMAP_SUBSET
@@ -57,7 +78,7 @@ rule unbiased_gene_dependency_analysis:
         GOI = config.get('GOI')
     shell:
         '''
-        python {UNBIASED_ANALYSIS} \
+        python {PAN_CANCER_UNBIASED_ANALYSIS} \
         -g {params.GOI} \
         -rs {GOI_RPKM_SUBSET} \
         -gds {DEPMAP_SUBSET} \
