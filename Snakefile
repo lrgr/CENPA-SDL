@@ -61,11 +61,13 @@ rule tissue_specific_unbiased_gene_dependency_analysis:
         GOI = config.get('GOI')
     shell:
         '''
+        mkdir {TISSUE_SPECFIC_OUTPUT_DIR}
         python {TISSUE_SPECIFIC_UNBIASED_ANALYSIS} \
         -g {params.GOI} \
         -rs {GOI_RPKM_SUBSET} \
         -gds {DEPMAP_SUBSET} \
         -od {TISSUE_SPECFIC_OUTPUT_DIR}
+        '''
 
 
 rule pan_cancer_unbiased_gene_dependency_analysis:

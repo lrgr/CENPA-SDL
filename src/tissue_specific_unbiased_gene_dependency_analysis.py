@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import mannwhitneyu
 from collections import Counter
+from os.path import join
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-g','--gene',type = str,required = True)
@@ -107,7 +108,7 @@ def plot(df,results,toi):
     type_nt = 'Non-{}'.format(toi_lower) 
 
     # title and filename
-    title = '{} vs. non-{} {} expression distribution.png'.format(toi_cap,toi_lower,args.gene)
+    title = '{} vs. non-{} {} expression distribution'.format(toi_cap,toi_lower,args.gene)
     file_name= '_'.join(title.split(' '))
 
     # plot canvas setup
@@ -142,7 +143,7 @@ def plot(df,results,toi):
     plt.text(2,45.5,'mean = '+round_3(results[8]),horizontalalignment='center',fontsize=24)
     plt.text(2,44.2,'std = '+round_3(results[9]),horizontalalignment='center',fontsize=24)
     plt.text(1,48.5,'Wilcoxon Rank Sum between selectd and non-selected p-value = '+round_3(results[3]),horizontalalignment='center',fontsize=22)
-    plt.savefig(args.output_dir+'{}'.format(file_name),
+    plt.savefig(join(args.output_dir,'{}.png'.format(file_name)),
             bbox_inches='tight', 
             pad_inches=0.5)
 
@@ -207,5 +208,5 @@ for tissue in TOI:
     non_high_GOI_cells = list(set(rpkm_toi.index)-set(high_GOI_cells))
     wilcoxon_results = wilcoxon_within_tissue_gd(df_gd,high_GOI_cells,non_high_GOI_cells)
     processed_results = results_processing(wilcoxon_results)
-    processed_results.to_csv(args.output_dir+'Wilcoxon_rank_sum_gd_{}_{}.tsv'.format(tissue.args.gene),sep = '\t')
+    processed_results.to_csv(join(args.output_dir,'Wilcoxon_rank_sum_gd_{}_{}.tsv'.format(tissue,args.gene)),sep = '\t')
     print('Wilcoxon rank sum test for gene dependency scores of {} cell lines completed'.format(tissue))
