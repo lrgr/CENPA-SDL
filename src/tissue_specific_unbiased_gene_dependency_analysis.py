@@ -142,7 +142,7 @@ def plot(df,results,toi):
     plt.text(1,44.2,'std = '+round_3(results[7]),horizontalalignment='center',fontsize=24)
     plt.text(2,45.5,'mean = '+round_3(results[8]),horizontalalignment='center',fontsize=24)
     plt.text(2,44.2,'std = '+round_3(results[9]),horizontalalignment='center',fontsize=24)
-    plt.text(1,48.5,'Wilcoxon Rank Sum between selectd and non-selected p-value = '+round_3(results[3]),horizontalalignment='center',fontsize=22)
+    plt.text(1,48.5,'Wilcoxon Rank Sum Test P-value = '+round_3(results[3]),horizontalalignment='center',fontsize=22)
     plt.savefig(join(args.output_dir,'{}.png'.format(file_name)),
             bbox_inches='tight', 
             pad_inches=0.5)
